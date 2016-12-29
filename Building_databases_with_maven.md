@@ -422,7 +422,7 @@ For security reasons it preferable to pass the database password in at run-time,
 ```xml
 <configuration>
 	<driver>org.postgresql.Driver</driver>
-	<username>lend_it_spend_it_admin</username>
+	<username>example_user</username>
 	<password>${password}</password>
 </configuration>
 ```
