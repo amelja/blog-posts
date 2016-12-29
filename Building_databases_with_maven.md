@@ -17,6 +17,7 @@ Let’s take a look at the following scenario for a better idea.
 A new project is started by a software team, and they have decided that they are going to use PostgreSQL as their relational database.  Because the team needs to be able to control and track changes to the database structure over time, they have chosen to use [GitHub](https://www.github.com) as their source control.
 
 To get started they will first create a basic database structure, which contains both a deployment and rollback script, and is separated down into the following files.
+
 ```
 ├── pom.xml
 ├── src
@@ -44,7 +45,8 @@ These files allow for the basic structure to be setup, and appropriate constrain
 
 ### Maven POM
 The first step is to create a Maven POM file at the root of the database project, from which the required XML configuration can be added.
-```
+
+```xml
 <project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.example</groupId>
@@ -59,7 +61,8 @@ The first step is to create a Maven POM file at the root of the database project
 
 ### Maven Plugins
 In order for Maven to do anything, it needs to be told what to do.  Out of the box Maven is relatively powerful for Java code, however a little less so for databases.  Fortunately, Maven is designed to allow for plugins to be created to greatly expand its basic capabilities.  Through adding the following simple configuration, it becomes possible for Maven to perform database operations.
-```
+
+```xml
 <build>
 	<plugins>
 		<plugin>
@@ -96,10 +99,12 @@ In order for Maven to do anything, it needs to be told what to do.  Out of the b
 	</plugins>
 </build>
 ```
+
 However as the project team is using individual files to physically separate the different elements that make up the database structure, the plugin needs to be told about these files.
 
 These files can be specified in two ways.  Either as absolute file paths, such as:
-```
+
+```xml
 <execution>
 	<id>deploy-tables</id>
 	<phase>compile</phase>
@@ -115,8 +120,10 @@ These files can be specified in two ways.  Either as absolute file paths, such a
 	</configuration>
 </execution>
 ```
+
 Or more conveniently as a partial file mask:
-```
+
+```xml
 <fileset>
 	<basedir>src/main/deploy/</basedir>
 	<includes>
@@ -124,10 +131,12 @@ Or more conveniently as a partial file mask:
 	</includes>
 </fileset>
 ```
+
 Obviously the order in which certain files gets executed can also be important.  The project team don’t want the build to fail because it tries to deploy the tables, before the schema which they are part of exists.  To get around this, the SQL-Maven-Plugin executes files in the order they are defined within the XML.
 
 Once the project team have updated their POM to include all the different database files described earlier, their POM will look something like this.
-```
+
+```xml
 <project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.example</groupId>
@@ -358,7 +367,8 @@ The final bit of configuration the development team need to add to the POM befor
 This is exactly where the power of Maven Profiles comes into play.  In this case, it allows for multiple different database instances to have their connection details configured in one location.  The specific database can then be targeted at the time the Maven build is run.
 
 The following XML configuration is all that is needed to connect to the localhost environment, and serves as the basis from which to add future profiles.
-```
+
+```xml
 <profiles>
 	<profile>
 		<id>local</id>
@@ -385,13 +395,15 @@ As maven executes its lifecycle goals in the order specified on the command line
 
 #### Deploy
 A deployment can be run without any rollback steps being executed, with the following command.  This will result in only the files marked with a ```<phase>compile</phase>``` being called on.
-```
+
+```sh
 mvn compile -Pdev
 ```
 
 #### Rollback
 A rollback can be run without any deployment steps being executed, with the following command. This will result in only the files marked with a ```<phase>clean</phase>``` being called on.
-```
+
+```sh
 mvn clean -Pdev
 ```
 
@@ -399,21 +411,25 @@ mvn clean -Pdev
 Whilst there may be times when only a deployment or rollback will be run, it is good-practice to run a rollback immediately before a deployment.  This is to ensure that both the database is put into an ‘expected’ and ‘consistent’ state, but perhaps more importantly validate that the rollback scripts run correctly on that environment.
 
 The following example will execute the scripts marked with ```<phase>clean</phase>``` immediately followed by ```<phase>clean</phase>```
-```
+
+```sh
 mvn clean compile -Pdev
 ```
 
 #### Security Enhancements
 For security reasons it preferable to pass the database password in at run-time, thereby removing the need to store the password in source control.  This can easily be achieved with a [Maven variable](http://books.sonatype.com/mvnref-book/reference/resource-filtering-sect-properties.html) with the following small changes to the POM, where ```${password}``` has replaced the previously hard-coded password.
-```
+
+```xml
 <configuration>
 	<driver>org.postgresql.Driver</driver>
 	<username>lend_it_spend_it_admin</username>
 	<password>${password}</password>
 </configuration>
 ```
+
 With this change applied, the following command is run to perform a clean deployment as before.
-```
+
+```sh
 mvn clean compile -Pdev -Dpassword=pass
 ```
 
@@ -434,6 +450,7 @@ Additionally, files that existed in the first release and not the subsequent wil
 Once a point-in-time has been recorded, the rollback directory should be cleared out, and the content of the deploy directory copied into it.  At this point a little care needs to be taken to ensure that the code included is able to roll back the database to a state consistent with the successful deployment of the previous release.  This means that when a rollback is run on version 1.1.0 of the database it will return it to version 1.0.0.
 
 At this same time, the deploy directory should be cleared out so that only DDL objects that can be safely re-deployed (stored procedures/functions, triggers etc…) without affecting existing data remain.
+
 ```
 ├── pom.xml
 ├── src
@@ -445,6 +462,7 @@ At this same time, the deploy directory should be cleared out so that only DDL o
 				└── functions
 					└── add_comment_fnc.sql
 ```
+
 From here any new SQL files or modifications to existing code can be added and tracked by source control.  The maven commands described previously for deploying and rolling back databases remain the same, only the code they are deploying changes.
 
 # Example Files
