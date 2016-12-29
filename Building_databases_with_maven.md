@@ -446,3 +446,6 @@ At this same time, the deploy directory should be cleared out so that only DDL o
 					└── add_comment_fnc.sql
 ```
 From here any new SQL files or modifications to existing code can be added and tracked by source control.  The maven commands described previously for deploying and rolling back databases remain the same, only the code they are deploying changes.
+
+# Example Files
+A complete example project can be found [here](https://github.com/amelja/maven-database-build-example) which gives you everything you need to get a basic database build working.  You may need to swap the JDBC driver if you plan to use something other than PostgreSQL.
