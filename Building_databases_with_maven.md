@@ -44,7 +44,7 @@ These files allow for the basic structure to be setup, and appropriate constrain
 
 ### Maven POM
 The first step is to create a Maven POM file at the root of the database project, from which the required XML configuration can be added.
-```xml
+```
 <project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.example</groupId>
@@ -59,7 +59,7 @@ The first step is to create a Maven POM file at the root of the database project
 
 ### Maven Plugins
 In order for Maven to do anything, it needs to be told what to do.  Out of the box Maven is relatively powerful for Java code, however a little less so for databases.  Fortunately, Maven is designed to allow for plugins to be created to greatly expand its basic capabilities.  Through adding the following simple configuration, it becomes possible for Maven to perform database operations.
-```xml
+```
 <build>
 	<plugins>
 		<plugin>
@@ -99,7 +99,7 @@ In order for Maven to do anything, it needs to be told what to do.  Out of the b
 However as the project team is using individual files to physically separate the different elements that make up the database structure, the plugin needs to be told about these files.
 
 These files can be specified in two ways.  Either as absolute file paths, such as:
-```xml
+```
 <execution>
 	<id>deploy-tables</id>
 	<phase>compile</phase>
@@ -116,7 +116,7 @@ These files can be specified in two ways.  Either as absolute file paths, such a
 </execution>
 ```
 Or more conveniently as a partial file mask:
-```xml
+```
 <fileset>
 	<basedir>src/main/deploy/</basedir>
 	<includes>
@@ -127,7 +127,7 @@ Or more conveniently as a partial file mask:
 Obviously the order in which certain files gets executed can also be important.  The project team don’t want the build to fail because it tries to deploy the tables, before the schema which they are part of exists.  To get around this, the SQL-Maven-Plugin executes files in the order they are defined within the XML.
 
 Once the project team have updated their POM to include all the different database files described earlier, their POM will look something like this.
-```xml
+```
 <project>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.example</groupId>
@@ -358,7 +358,7 @@ The final bit of configuration the development team need to add to the POM befor
 This is exactly where the power of Maven Profiles comes into play.  In this case, it allows for multiple different database instances to have their connection details configured in one location.  The specific database can then be targeted at the time the Maven build is run.
 
 The following XML configuration is all that is needed to connect to the localhost environment, and serves as the basis from which to add future profiles.
-```xml
+```
 <profiles>
 	<profile>
 		<id>local</id>
@@ -405,7 +405,7 @@ mvn clean compile -Pdev
 
 #### Security Enhancements
 For security reasons it preferable to pass the database password in at run-time, thereby removing the need to store the password in source control.  This can easily be achieved with a [Maven variable](http://books.sonatype.com/mvnref-book/reference/resource-filtering-sect-properties.html) with the following small changes to the POM, where ```${password}``` has replaced the previously hard-coded password.
-```xml
+```
 <configuration>
 	<driver>org.postgresql.Driver</driver>
 	<username>lend_it_spend_it_admin</username>
