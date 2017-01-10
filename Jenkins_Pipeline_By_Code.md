@@ -227,3 +227,6 @@ stage("Push to Artifactory") {
 
 }
 ```
+
+# Useful Links
+[Official Pipeline Docs](https://jenkins.io/doc/book/pipeline/)
